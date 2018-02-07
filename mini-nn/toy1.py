@@ -12,7 +12,7 @@ def nonlin(x, deriv=False):
 
 
 def lin(x, deriv=False):
-    ''' liner function'''
+    ''' linear function'''
     is_in = (np.abs(x) <= 1).astype(float)
     if deriv:
         return is_in
@@ -20,10 +20,13 @@ def lin(x, deriv=False):
 
 
 def plot_error(sq_errs):
-    for sq_err in sq_errs:
-        plt.plot(sq_err)
+    lgds = []
+    for name, sq_err in sq_errs.items():
+        line = plt.plot(sq_err, label=name)
+        lgds.append(name)
+    plt.legend(lgds)
     plt.ylabel('Squared Error')
-    plt.ylim((0, max([max(sq_err) for sq_err in sq_errs]) + 0.05))
+    plt.ylim((0, max([max(sq_err) for sq_err in sq_errs.values()]) + 0.05))
     plt.xlabel('epoch')
     plt.title('Evolution of Squared Error by Epoch')
     plt.show()
@@ -54,13 +57,13 @@ def train(activation_function, n_epoch=1000):
          syn0 += np.dot(X.T, l1_delta) #updating of the weights
     return l1, sq_err
 
-activations_functions = [nonlin, lin]
-sq_errs = []
-for activations_function in activations_functions:
-    l1, sq_err = train(activations_function, 100)
-    print('Output after training:\n{}'.format(l1))
-    sq_errs.append(sq_err)
+activation_functions = {'non-linear': nonlin, 'linear':  lin}
+sq_errs = {}
+for name, activation_function in activation_functions.items():
+    l1, sq_err = train(activation_function, 1000)
+    print('{}: output after training:\n{}'.format(name, l1))
+    sq_errs[name] = sq_err
 
 plot_error(sq_errs)
 
-# linear learns faster
+# linear learns faster when it learns...
