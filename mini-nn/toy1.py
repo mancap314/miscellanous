@@ -31,19 +31,12 @@ def plot_error(sq_errs):
     plt.title('Evolution of Squared Error by Epoch')
     plt.show()
 
-#Input
-X = np.array([[0, 0, 1],
-              [0, 1, 1],
-              [1, 0, 1],
-              [1, 0, 1]])
 
-# value to find aka ground truth aka...
-y = np.array([[0, 0, 1, 1]]).T
 
 # set seed (for reproducibility)
 np.random.seed(1)
 
-def train(activation_function, n_epoch=1000):
+def train_1(X, y, activation_function, n_epoch=1000):
     # initialize weights
     syn0 = 2 * np.random.random((3, 1)) - 1 #1st term in (0, 2), -1: in (-1, 1), mean: 0
     sq_err = []
@@ -57,13 +50,57 @@ def train(activation_function, n_epoch=1000):
          syn0 += np.dot(X.T, l1_delta) #updating of the weights
     return l1, sq_err
 
-activation_functions = {'non-linear': nonlin, 'linear':  lin}
-sq_errs = {}
-for name, activation_function in activation_functions.items():
-    l1, sq_err = train(activation_function, 1000)
-    print('{}: output after training:\n{}'.format(name, l1))
-    sq_errs[name] = sq_err
 
-plot_error(sq_errs)
+def train_2(X, y, activation_function, n_epoch=60000):
+    syn0 = 2 * np.random.random((3, 4)) - 1
+    syn1 = 2 * np.random.random((4, 1)) - 1
+    sq_err = []
+    for i in range(n_epoch):  # push forward
+        l1 = activation_function(X.dot(syn0))
+        l2 = activation_function(l1.dot(syn1))
 
-# linear learns faster when it learns...
+        # l2
+        l2_error = y - l2
+        l2_delta = l2_error * activation_function(l2, True)
+
+        sq_err.append(np.square(l2_error).mean())
+
+        # l1, back-propagation
+        l1_error = l2_delta.dot(syn1.T)
+        l1_delta = l1_error * activation_function(l1, True)
+
+        # weight update
+        syn1 += l1.T.dot(l2_delta)  # correction = input * delta
+        syn0 += X.T.dot(l1_delta)
+
+    return l2, sq_err
+
+
+def run_training(X, y, train, n_epoch=1000):
+    activation_functions = {'non-linear': nonlin, 'linear':  lin}
+    sq_errs = {}
+    for name, activation_function in activation_functions.items():
+        l1, sq_err = train(X, y, activation_function, n_epoch)
+        print('{}: output after training:\n{}'.format(name, l1))
+        sq_errs[name] = sq_err
+
+    plot_error(sq_errs)
+
+
+def run_example_1():
+    X = np.array([[0, 0, 1],
+                      [0, 1, 1],
+                      [1, 0, 1],
+                      [1, 0, 1]])
+    y = np.array([[0, 0, 1, 1]]).T
+    run_training(X, y, train_1, 1000)
+
+
+def run_example_2():
+    X = np.array([[0, 0, 1],
+                  [0, 1, 1],
+                  [1, 0, 1],
+                  [1, 1, 1]])
+
+    y = np.array([[0, 1, 1, 0]]).T
+    run_training(X, y, train_2, 60000)
