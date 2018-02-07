@@ -20,7 +20,7 @@ import pandas as pd
 # print(res)
 # # OK
 
-## Ex 1.2: Build term-document incidence matrix
+### Ex 1.2: Build term-document incidence matrix
 docs = {'doc1': 'breakthrough drug for schizophrenia',
 'doc2': 'new schizophrenia drug',
 'doc3': 'new approach for treatment of schizophrenia',
@@ -28,20 +28,21 @@ docs = {'doc1': 'breakthrough drug for schizophrenia',
 
 #build indices: build list of distict words in corpus
 indices = []
-for key, value in docs.items():
-    # new_words = [word for word in value.split(' ') if word not in indices]
+for text in docs.values():
+    # new_words = [word for word in text.split(' ') if word not in indices]
     # indices += new_words
     # alternative: with set difference
-    indices += list(set(value.split(' ')) - set(indices))
+    indices += list(set(text.split(' ')) - set(indices))
 
 indices.sort()
 
 res = {'word': indices}
 for key, value in docs.items():
-    res[key] = [float(word in value.split(' ')) for word in indices]
+    res[key] = [int(word in value.split(' ')) for word in indices]
 
 res = pd.DataFrame(res).set_index('word')
 print(res)
+# OK
 
 
 
