@@ -20,29 +20,81 @@ import pandas as pd
 # print(res)
 # # OK
 
-### Ex 1.2: Build term-document incidence matrix
-docs = {'doc1': 'breakthrough drug for schizophrenia',
-'doc2': 'new schizophrenia drug',
-'doc3': 'new approach for treatment of schizophrenia',
-'doc4': 'new hopes for schizophrenia patients'}
+# ### Ex 1.2: Build term-document incidence matrix
+# docs = {'doc1': 'breakthrough drug for schizophrenia',
+# 'doc2': 'new schizophrenia drug',
+# 'doc3': 'new approach for treatment of schizophrenia',
+# 'doc4': 'new hopes for schizophrenia patients'}
+#
+# #build indices: build list of distict words in corpus
+# indices = []
+# for text in docs.values():
+#     # new_words = [word for word in text.split(' ') if word not in indices]
+#     # indices += new_words
+#     # alternative: with set difference
+#     indices += list(set(text.split(' ')) - set(indices))
+#
+# indices.sort()
 
-#build indices: build list of distict words in corpus
-indices = []
-for text in docs.values():
-    # new_words = [word for word in text.split(' ') if word not in indices]
-    # indices += new_words
-    # alternative: with set difference
-    indices += list(set(text.split(' ')) - set(indices))
+# res = {'word': indices}
+# for key, value in docs.items():
+#     res[key] = [int(word in value.split(' ')) for word in indices]
+#
+# res = pd.DataFrame(res).set_index('word')
+# print(res)
+# # OK
 
-indices.sort()
+# ### AND merge algorithm (intersection)
+# def and_merge(l1, l2):
+#     result = []
+#     i1, i2 = 0, 0
+#     while i1 < (len(l1) - 2) or i2 < (len(l2) - 2):
+#         print('i1 = {}, i2 = {}'.format(i1, i2))
+#         if l1[i1] == l2[i2]:
+#             result.append(l1[i1])
+#             i1 += 1
+#             i2 += 1
+#             continue
+#         if l1[i1] < l2[i2]:
+#             i1 += 1
+#         else:
+#             i2 += 1
+#     return result
+#
+# l1 = [1, 3, 6, 9, 13, 18]
+# l2 = [3, 13, 18, 24, 51]
+# print(and_merge(l1, l2))
 
-res = {'word': indices}
-for key, value in docs.items():
-    res[key] = [int(word in value.split(' ')) for word in indices]
+# Ex 1.11
+def and_not_merge(l1, l2):
+    '''delta between two lists'''
+    result = []
+    i1, i2 = 0, 0
+    while i1 < (len(l1) - 2) or i2 < (len(l2) - 2):
+        if l1[i1] < l2[i2]:
+            result.append(l1[i1])
+            i1 += 1
+            continue
+        if l2[i2] < l1[i1]:
+            result.append(l2[i2])
+            i2 += 1
+            continue
+        i1 += 1
+        i2 += 1
+    if i1 < len(l1) - 1:
+        result += l1[i1:]
+    if i2 < len(l2) - 1:
+        result += l2[i2:]
+    return result
 
-res = pd.DataFrame(res).set_index('word')
-print(res)
-# OK
+l1 = [1, 3, 6, 9, 13, 18]
+l2 = [3, 13, 18, 24, 51]
+print(and_not_merge(l1, l2))
+
+# On Google, burglar OR burglar: 34,6M results, AND: 25.6
+
+
+
 
 
 
